@@ -18,4 +18,10 @@
 # include <unistd.h>
 # include <sys/time.h>
 # include <pthread.h>
+
+typedef struct s_list
+{
+	long				content;
+	struct s_list		*next;
+}	t_list;
 #endif
