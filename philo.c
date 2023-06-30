@@ -85,6 +85,10 @@ void	get_args(char **argv)
 	t_list	args;
 	
 	args = NULL;
+	while (++argv)
+		ft_atio(*argv, args);
+	if (ft_lstsize(args) < 4 || ft_lstsize(args) > 5)
+		exit_program(args);
 	
 }
 
