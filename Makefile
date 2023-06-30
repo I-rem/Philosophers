@@ -19,7 +19,7 @@ all:		${NAME}
 bonus:		all
 
 clean:
-			@ ${RM} *.o
+			@ ${RM} ${OBJS}
 
 fclean:		clean
 			@ ${RM} ${NAME}
