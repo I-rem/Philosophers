@@ -14,6 +14,11 @@
 
 void    free_all(t_table *table)
 {
+    int i;
+
+    i = -1;
+    while (++i < table->philo_num)
+         pthread_mutex_destroy(&table->forks[i]);
     if(table->philos != NULL)
         free(table->philos);
      if (table->forks != NULL)
@@ -47,8 +52,8 @@ void    init_philos(int die_time, int eat_time, int sleep_time)
         table->philos[i].eat_count = 0;
         table->philos[i].is_alive = 1;
         table->philos[i].table = table;
-        table->philos[i].left_fork =;
-        table->philos[i].right_fork =;
+        table->philos[i].left_fork = &table->forks[i];
+        table->philos[i].right_fork = &table->forks[(i + 1) % table->philo_num];
         i++;
     }
 }
@@ -60,6 +65,12 @@ void    init_forks(t_table *table)
     i = -1;
     while (++i < table->philo_num)
         pthread_mutex_t_init(&table->forks[i], NULL);
+}
+
+void    start_routine(t_philo   *philo)
+{
+
+    return(NULL);
 }
 
 int ft_atoi(const char *str)
@@ -109,6 +120,7 @@ int	main(int argc, char **argv)
 {
 	t_table	table;
 	int		must_eat_num;
+    int     i;
 
 	must_eat_num = -1;
 	if (!arg_check(argv, argc) || ft_atoi(argv[1]) == -1 || ft_atoi(argv[2]) == -1 || ft_atoi(argv[3]) == -1
@@ -121,6 +133,12 @@ int	main(int argc, char **argv)
 		must_eat_num = ft_atoi(argv[5]);
     init_table(&table, ft_atoi(argv[1]), must_eat_num);
     init_forks(&table);
-    init_philos();
+    init_philos(&table,ft_atoi(argv[2]), ft_atoi(argv[3]), ft_atoi(argv[4]));
+    i = -1;
+    while(++i < table->philo_num)
+        pthread_create(&table->threads, NULL, start_routine, &table->philos[i]);
+    i = -1;
+     while(++i < table->philo_num)
+        pthread_join(table->threads, NULL);
     free_all(&table);
 }
