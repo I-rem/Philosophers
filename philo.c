@@ -16,15 +16,50 @@ void    free_all(t_table *table)
 {
     if(table->philos != NULL)
         free(table->philos);
+     if (table->forks != NULL)
+        free(table->forks);
+    if (table->threads != NULL)
+        free(table->threads);
+
 }
 
 void    init_table(t_table *table, int philo_num, int must_eat_num)
 {
     table->philo_num = philo_num;
     table->must_eat_num = must_eat_num;
-    table->philos = malloc(philo_num * sizeof(t_philo));
     table->has_dead = 0;
+    table->philos = malloc(philo_num * sizeof(t_philo));
+    table->forks = malloc(philo_num * sizeof(pthread_mutex_t));
+    table->thread =malloc(philo_num * sizeof(pthread_t));
+}
 
+void    init_philos(int die_time, int eat_time, int sleep_time)
+{
+    int i;
+
+    i = 0;
+    while(i < table->philo_num)
+    {
+        table->philos[i].id = i + 1;
+        table->philos[i].die_time = die_time
+        table->philos[i].eat_time = eat_time
+        table->philos[i].sleep_time = sleep_time
+        table->philos[i].eat_count = 0;
+        table->philos[i].is_alive = 1;
+        table->philos[i].table = table;
+        table->philos[i].left_fork =;
+        table->philos[i].right_fork =;
+        i++;
+    }
+}
+
+void    init_forks(t_table *table)
+{
+    int i;
+
+    i = -1;
+    while (++i < table->philo_num)
+        pthread_mutex_t_init(&table->forks[i], NULL);
 }
 
 int ft_atoi(const char *str)
@@ -85,7 +120,7 @@ int	main(int argc, char **argv)
 	if (argc == 6)
 		must_eat_num = ft_atoi(argv[5]);
     init_table(&table, ft_atoi(argv[1]), must_eat_num);
-    init_forks();
+    init_forks(&table);
     init_philos();
     free_all(&table);
 }
