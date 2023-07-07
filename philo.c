@@ -22,57 +22,47 @@ void	exit_program(t_list **a, t_list **b)
 	exit(EXIT_FAILURE);
 }
 
-void	ft_atoi(char *str, t_list **a) // need max min check also negative values arent acceptable
+int ft_atoi(const char *str)
 {
-	long long		result;
+    long long result;
 
-	while (*str != '\0')
-	{
-		result = 0;
-		while (*str == 32 || (*str >= 9 && *str <= 13))
-			str++;
-		if (*str != '\0')
-		{
-			if (*str == '-' || *str == '+')
-				str++;
-			while (*str >= '0' && *str <= '9')
-			{
-				result = result * 10 + *str - 48;
-				str++;
-			}
-			while (*str == 32 || (*str >= 9 && *str <= 12))
-				str++;
-				if (result > MAX_INT)
-					exit_program(a, NULL);
-			ft_lstadd_back(a, ft_lstnew(result));
-		}
-	}
+    result = 0;
+    while (*str == 32 || (*str >= 9 && *str <= 13))
+        str++;
+    if (*str == '+')
+        str++;
+    while (*str >= '0' && *str <= '9')
+    {
+        result = result * 10 + *str - 48;
+        str++;
+        if (result > 2147483647)
+            result = -1;
+    }
+    return (result);
 }
 
-int	arg_check(char **argv) // arg count and non numeric/negative parameters check
+int arg_check(char **argv, int argc)
 {
-	int	i;
-	int	j;
+    int i;
+    int j;
 
-	i = 0;
-	while (argv[++i] != NULL)
-	{
-		j = -1;
-		while (argv[i][++j] != '\0')
-		{
-			if (argv[i][j] == '+')
-				&& !(argv[i][j + 1] <= '9' && argv[i][j + 1] >= '0'))
-				return (0);
-			else if (argv[i][j] == '+' && (j != 0 && argv[i][j - 1] != ' '))
-				return (0);
-			else if (argv[i][j] != ' ' && argv[i][j] != '+'
-					&& (argv[i][j] < '0' || argv[i][j] > '9'))
-				return (0);
-		}
-	}
-	if (i < 6 || i > 7)
-		return (0);
-	return (1);
+    if (argc < 5 || argc > 6)
+        return (0);
+    i = 0;
+    while (argv[++i] != NULL)
+    {
+        j = -1;
+        while (argv[i][++j] != '\0')
+        {
+            if (argv[i][j] == '+' && !(argv[i][j + 1] <= '9' && argv[i][j + 1] >= '0'))
+                return (0);
+            else if (argv[i][j] == '+' && (j != 0 && argv[i][j - 1] != ' '))
+                return (0);
+            else if (argv[i][j] != ' ' && argv[i][j] != '+' && (argv[i][j] < '0' || argv[i][j] > '9'))
+                return (0);
+        }
+    }
+    return (1);
 }
 
 void	get_args(char **argv)
@@ -94,7 +84,18 @@ void	get_args(char **argv)
 
 int	main(int argc, char **argv)
 {
-	if (!arg_check(argv))
-			return (1);
+	t_table	table;
+	int		must_eat_num;
+
+	must_eat_num = -1;
+	if (!arg_check(argv, argc) || ft_atoi(argv[1]) == -1 || ft_atoi(argv[2]) == -1 || ft_atoi(argv[3]) == -1
+		|| ft_atoi(argv[4]) || (argc == 6 && ft_atoi(argv[5]) == -1)) 
+	{
+        write(2, "Enter valid arguments!\n", 23);
+        return (1);
+    }
+	if (argc == 6)
+		must_eat_num = ft_atoi(argv[5]);
+
 	get_args(argv);
 }
