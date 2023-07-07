@@ -19,29 +19,26 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-typedef struct s_list
-{
-	long				content;
-	struct s_list		*next;
-}	t_list;
+typedef struct s_philo t_philo;
+typedef struct s_table t_table;
 
 typedef struct s_philo
 {
 	int		id;
-	int		philo_num;
-	int		die_time;
-	int		eat_time;
-	int		sleep_time;
+	long		die_time;
+	long		eat_time;
+	long		sleep_time;
 	int		eat_count;
-	int		must_eat_num;
+	int		is_alive;
 	t_table	*table;
 }	t_philo;
 
 typdef struct	s_table
 {
-	int		num_philosopheres;
-	t_philo	*philosopher;
+	int		num_philos;
+	t_philo	*philos;
 	int		must_eat_num;
+	int		has_dead;
 }	t_table;
 
 #endif

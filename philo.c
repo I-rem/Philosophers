@@ -10,16 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//int philo_num, int die_time, int eat_time, int sleep_time, int must_eat_num
+#include "philo.h"
 
-void	exit_program(t_list **a, t_list **b)
+void    free_all(t_table *table)
 {
-	if (a != NULL)
-		ft_lstclear(a);
-	if (b != NULL)
-		ft_lstclear(b);
-	write(2, "Error\n", 6);
-	exit(EXIT_FAILURE);
+    if(table->philos != NULL)
+        free(table->philos);
+}
+
+void    init_table(t_table *table, int philo_num, int must_eat_num)
+{
+    table->philo_num = philo_num;
+    table->must_eat_num = must_eat_num;
+    table->philos = malloc(philo_num * sizeof(t_philo));
+    table->has_dead = 0;
+
 }
 
 int ft_atoi(const char *str)
@@ -65,23 +70,6 @@ int arg_check(char **argv, int argc)
     return (1);
 }
 
-void	get_args(char **argv)
-{
-	int		philo_num;
-	int		die_time;
-	int		eat_time;
-	int		sleep_time;
-	int		must_eat_num;
-	t_list	args;
-	
-	args = NULL;
-	while (++argv)
-		ft_atio(*argv, args);
-	if (ft_lstsize(args) < 4 || ft_lstsize(args) > 5)
-		exit_program(args);
-	
-}
-
 int	main(int argc, char **argv)
 {
 	t_table	table;
@@ -96,6 +84,8 @@ int	main(int argc, char **argv)
     }
 	if (argc == 6)
 		must_eat_num = ft_atoi(argv[5]);
-
-	get_args(argv);
+    init_table(&table, ft_atoi(argv[1]), must_eat_num);
+    init_forks();
+    init_philos();
+    free_all(&table);
 }
