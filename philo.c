@@ -12,6 +12,29 @@
 
 #include "philo.h"
 
+void    checker(t_philo *philo)
+{
+
+}
+
+void    create_checker(t_philo *philo)
+{
+    pthread_t   checker_thread;
+    pthread_create(&checker, NULL, checker, philo);
+    pthread_detach(checker_thread);
+}
+
+void    check_death(t_philo *philo, long last_eat_time, long die_time)
+{
+    if (philo->is_alive && last_eat_time > die_time)
+        print_death(philo);
+}
+
+void    check_starve()
+{
+
+}
+
 long    get_timestamp(t_philo *philo)
 {
     struct timeval  current_time;
@@ -26,6 +49,18 @@ long    get_timestamp(t_philo *philo)
 void    print_log(t_philo *philo, char *message)
 {
     pthread_mutex_lock(&philo->table->print_lock);
+    pthread_mutex_unlock(&philo->table->print_lock);
+}
+
+print_death()
+{
+    pthread_mutex_lock(&philo->table->print_lock);
+    if (!philo->table->has_dead)
+    {
+        printf("%ld %d died\n", get_timestamp(philo), philo->id);
+        philo->is_alive = 0;
+        philo->table->has_dead = 1;
+    }
     pthread_mutex_unlock(&philo->table->print_lock);
 }
 
