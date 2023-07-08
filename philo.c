@@ -67,6 +67,31 @@ void    init_forks(t_table *table)
         pthread_mutex_t_init(&table->forks[i], NULL);
 }
 
+void    pick_forks(t_philo *philo)
+{
+    pthread_mutex_t *left_fork;
+    pthread_mutex_t *right_fork;
+
+    left_fork = philo->left_fork;
+    right_fork = philo->right_fork;
+    if (philo->id % 2 == 0)
+    {
+        ptthread_mutex_lock(right_fork);
+        ptthread_mutex_lock(left_fork);
+    }
+    else
+    {
+        ptthread_mutex_lock(left_fork);
+        pthread_mutex_lock(right_fork);
+    }
+}
+
+void    put_back_forks(t_philo *philo)
+{
+    pthread_mutex_t_unlock(philo->left_fork);
+    pthread_mutex_t_unlock(philo->right_fork);
+}
+
 void    start_routine(t_philo   *philo)
 {
 
