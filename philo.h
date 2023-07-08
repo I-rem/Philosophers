@@ -28,10 +28,12 @@ typedef struct s_philo
 	long			die_time;
 	long			eat_time;
 	long			sleep_time;
+	long			last_eat_time;
 	int				eat_count;
 	int				is_alive;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*left_fork
+	pthread_mutex_t eat_count_lock;
 	t_table	*table;
 }	t_philo;
 
@@ -41,8 +43,12 @@ typdef struct	s_table
 	t_philo	*philos;
 	int		must_eat_num;
 	int		has_dead;
+	int		done_eating;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	*print_lock;
+	pthread_mutex_t	*finish_lock;
 	pthread_t	*threads;
+	struct	timeval	start_time;
 }	t_table;
 
 void    free_all(t_table *table);
