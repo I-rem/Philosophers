@@ -12,27 +12,74 @@
 
 #include "philo.h"
 
-void    checker(t_philo *philo)
+void    manager(t_philo *philo)
 {
+    long	die_time;
+    int		has_eaten;
+	long	current_time;
+	long	time_since_last_eat;
+	
+    die_time = philo->die_time;
+    has_eaten = 0;
+    while (1) 
+	{
+        usleep(100);
+        current_time = get_timestamp(philo);
+        time_since_last_eat = current_time - philo->last_eat_time;
+ 	if (!(has_eaten) && time_since_last_eat > die_time) 
+	{
+        print_philo_died(philo);
+        has_eaten = 1;
+    }
+        if (philo->is_alive &&  time_since_last_eat > die_time)
+            print_death(philo);
+        check_starve(philo, time_since_last_eat);
+        if (!philo->is_alive)
+            break;
+    }
+    return (NULL);
 
 }
 
-void    create_checker(t_philo *philo)
+void    check_starve(t_philo *philo, long time_since_last_eat)
 {
-    pthread_t   checker_thread;
-    pthread_create(&checker, NULL, checker, philo);
-    pthread_detach(checker_thread);
+    int done_eating;
+
+    if (philo->is_alive && time_since_last_eat > philo->die_time)
+    {
+        pthread_mutex_lock(&philo->table->finish_lock);
+        done_eating = philo->table->done_eating;
+        pthread_mutex_unlock(&philo->table->finish_lock);
+        if(done_eating < philo->table->philo_num - 1)
+            print_death(philo);
+    }
 }
 
-void    check_death(t_philo *philo, long last_eat_time, long die_time)
+void    check_must_eat_num(t_philo *philo, int must_eat_num)
 {
-    if (philo->is_alive && last_eat_time > die_time)
-        print_death(philo);
+    if (must_eat_num != -1 && philo->eat_count >= must_eat_num) //try to make this work with == must_eat_num 
+    {
+        int done_eating;
+        pthread_mutex_lock(&philo->table->finish_lock);
+        done_eating = philo->table-done_eating + 1;
+        pthread_mutex_unlock(&philo->table->finish_lock);
+    }
+    if (done_eating == philo->table->philo_num)
+    {
+        pthread_mutex_lock(&philo->table->print_lock);
+        if (!philo->table->has_dead)
+            philo->table->has_dead = 1;
+        pthread_mutex_unlock(&philo->table->print_lock);
+    }
 }
 
-void    check_starve()
+void    philo_sleep(t_philo *philo)
 {
-
+    print_message(philo, "is sleeping");
+    usleep(philo->sleep_time * 1000);
+    pthread_mutex_lock(&philo->eat_count_lock);
+    philo->eat_count++;
+    pthread_mutex_unlock(&philo->eat_count_lock);
 }
 
 long    get_timestamp(t_philo *philo)
@@ -49,10 +96,16 @@ long    get_timestamp(t_philo *philo)
 void    print_log(t_philo *philo, char *message)
 {
     pthread_mutex_lock(&philo->table->print_lock);
+    if (!philo->table->has_dead)
+    {
+        printf("%ld %d %s\n", get_timestamp(philo), philo->id, message);
+        //if (message[0] == 'd')
+        //    philo->table->has_dead=1;
+    }
     pthread_mutex_unlock(&philo->table->print_lock);
 }
 
-print_death()
+void    print_death(t_philo *philo)
 {
     pthread_mutex_lock(&philo->table->print_lock);
     if (!philo->table->has_dead)
@@ -162,7 +215,16 @@ void    eat(t_philo *philo)
 
 void    start_routine(t_philo   *philo)
 {
+    pthread_t   manager_thread;
 
+    pthread_create(&manager, NULL, manager, philo);
+    pthread_detach(manager_thread);
+    while (!philo->table->has_dead)
+    {
+        check_must_eat_num(philo, must_eat_num);
+        eat(philo);
+        philo_sleep(philo);
+    }
     return(NULL);
 }
 

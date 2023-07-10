@@ -53,8 +53,17 @@ typdef struct	s_table
 
 void    free_all(t_table *table);
 void    init_table(t_table *table, int philo_num, int must_eat_num);
-void    init_philos();
+void    init_philos(int die_time, int eat_time, int sleep_time)
 void    init_forks(t_table *table);
 int ft_atoi(const char *str);
 int arg_check(char **argv, int argc);
+void    create_manager(t_philo *philo);
+void    manager(t_philo *philo);
+void    check_death(t_philo *philo, long last_eat_time, long die_time);
+void    check_starve(t_philo *philo, long time_since_last_eat);
+void    check_must_eat_num(t_philo *philo, int must_eat_num);
+void    philo_sleep(t_philo *philo);
+long    get_timestamp(t_philo *philo);
+void    print_log(t_philo *philo, char *message);
+void    print_death(t_philo *philo)
 #endif
