@@ -60,10 +60,10 @@ after the actual death of the philosopher.
 Your program must not have any data races.
 Mandatory part
 
-Program name philo
+Program name: philo
 
-Turn in files Makefile, *.h, *.c, in directory philo/
-Makefile NAME, all, clean, fclean, re
+Turn in files: Makefile, *.h, *.c, in directory philo/
+Makefile: NAME, all, clean, fclean, re
 
 Arguments 
 number_of_philosophers 
