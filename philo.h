@@ -19,8 +19,8 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-typedef struct s_philo t_philo;
-typedef struct s_table t_table;
+typedef struct s_philo	t_philo;
+typedef struct s_table	t_table;
 
 typedef struct s_philo
 {
@@ -34,7 +34,7 @@ typedef struct s_philo
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	eat_count_lock;
-	t_table	*table;
+	t_table			*table;
 }	t_philo;
 
 typedef struct s_table
@@ -51,7 +51,7 @@ typedef struct s_table
 	struct timeval	start_time;
 }	t_table;
 
-void*	manager(void *philo);
+void	*manager(void *philo);
 void	check_starve(t_philo *philo, long time_since_last_eat);
 void	check_must_eat_num(t_philo *philo, int must_eat_num);
 void	philo_sleep(t_philo *philo);
@@ -63,7 +63,7 @@ void	init_table(t_table *table, int philo_num, int must_eat_num);
 void	init_philos(t_table *table, int die_time, int eat_time, int sleep_time);
 void	init_forks(t_table *table);
 void	eat(t_philo *philo);
-void*	start_routine(void *philo);
+void	*start_routine(void *philo);
 int		ft_atoi(const char *str);
 int		arg_check(char **argv, int argc);
 #endif
