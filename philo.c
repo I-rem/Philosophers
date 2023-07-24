@@ -59,10 +59,10 @@ void	check_must_eat_num(t_philo *philo, int must_eat_num)
 	int	done_eating;
 
 	done_eating = 0;
-	if (must_eat_num != -1 && philo->eat_count == must_eat_num)
+	if (must_eat_num != -1 && philo->eat_count == must_eat_num) //try to make this work with == must_eat_num 
 	{
 		pthread_mutex_lock(&philo->table->finish_lock);
-		done_eating = ++philo->table->done_eating;  // increment and update done_eating while mutex is locked
+		done_eating = philo->table->done_eating + 1;
 		pthread_mutex_unlock(&philo->table->finish_lock);
 	}
 	if (done_eating == philo->table->num_philos)
@@ -146,10 +146,9 @@ int	main(int argc, char **argv)
 	init_philos(&table, ft_atoi(argv[2]), ft_atoi(argv[3]), ft_atoi(argv[4]));
 	i = -1;
 	while (++i < table.num_philos)
-		pthread_create(&table.threads[i], NULL, start_routine, &table.philos[i]);  // pass address of each thread
+		pthread_create(table.threads, NULL, start_routine, &table.philos[i]);
 	i = -1;
 	while (++i < table.num_philos)
-		pthread_join(table.threads[i], NULL);  // join each thread separately
+		pthread_join(*table.threads, NULL);
 	free_all(&table);
-	return 0;  // the main function should return a value
 }
