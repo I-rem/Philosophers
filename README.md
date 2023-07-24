@@ -79,8 +79,6 @@ pthread_detach, pthread_join, pthread_mutex_init,
 pthread_mutex_destroy, pthread_mutex_lock,
 pthread_mutex_unlock
 
-**Libft authorized:** No
-
 **Description*:* Philosophers with threads and mutexes
 
 The specific rules for the mandatory part are:
@@ -91,5 +89,5 @@ side. If there is only one philosopher, there should be only one fork on the tab
 - To prevent philosophers from duplicating forks, you should protect the forks state
 with a mutex for each of them.
 
-#Evaluation
+# Evaluation
 
