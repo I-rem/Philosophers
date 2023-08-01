@@ -8,22 +8,20 @@ void    *manager(void *v_philo)
     long    time_since_last_eat;
 
     die_time = philo->die_time;
-    while (1) 
+    while (philo->is_alive) 
     {
-        pthread_mutex_lock(&philo->eat_lock);
         current_time = get_timestamp(philo);
         time_since_last_eat = current_time - philo->last_eat_time;
-        pthread_mutex_unlock(&philo->eat_lock);
-
         if (philo->is_alive && time_since_last_eat > die_time)
         {
             print_death(philo);
+            philo->is_alive = 0;
             break ;
         }
-        usleep(100);
     }
     return (NULL);
 }
+
 
 void    check_starve(t_philo *philo, long time_since_last_eat)
 {
@@ -64,22 +62,37 @@ void    free_all(t_table *table)
 
 void    pick_forks(t_philo *philo)
 {
-    pthread_mutex_t    *first_fork;
-    pthread_mutex_t    *second_fork;
+    pthread_mutex_t    *left_fork;
+    pthread_mutex_t    *right_fork;
+    int has_two_forks = 1;
 
+    left_fork = philo->left_fork;
+    right_fork = philo->right_fork;
     if (philo->id % 2 == 0)
     {
-        first_fork = philo->right_fork;
-        second_fork = philo->left_fork;
+        pthread_mutex_lock(right_fork);
+        if (left_fork != right_fork)
+            pthread_mutex_lock(left_fork);
+        else
+            has_two_forks = 0;
     }
     else
     {
-        first_fork = philo->left_fork;
-        second_fork = philo->right_fork;
+        pthread_mutex_lock(left_fork);
+        if (left_fork != right_fork)
+            pthread_mutex_lock(right_fork);
+        else
+            has_two_forks = 0;
     }
-    pthread_mutex_lock(first_fork);
-    pthread_mutex_lock(second_fork);
+    if (!has_two_forks) 
+    {
+        usleep(philo->die_time * 1000);
+        print_death(philo);
+        philo->is_alive = 0;
+    }
 }
+
+
 
 
 void    *start_routine(void *v_philo)
@@ -89,20 +102,19 @@ void    *start_routine(void *v_philo)
 
     pthread_create(&manager_thread, NULL, manager, v_philo);
     pthread_detach(manager_thread);
-    while (1)
+    while (philo->is_alive)
     {
         check_must_eat_num(philo, philo->table->must_eat_num);
-        if (philo->table->has_dead)
+        if (philo->table->has_dead || !philo->is_alive)
             break ;
         eat(philo);
-        if (philo->table->has_dead)
-            break ;
         philo_sleep(philo);
-        if (philo->table->has_dead)
+        if (philo->table->has_dead || !philo->is_alive)
             break ;
     }
     return (NULL);
 }
+
 
 
 
@@ -238,20 +250,18 @@ long    get_timestamp(t_philo *philo)
 void    eat(t_philo *philo)
 {
     pick_forks(philo);
-
-    pthread_mutex_lock(&philo->eat_lock);
+    pthread_mutex_unlock(philo->left_fork);
+    pthread_mutex_unlock(philo->right_fork);
     philo->last_eat_time = get_timestamp(philo);
     print_log(philo, "is eating");
     usleep(philo->eat_time * 1000);
-    pthread_mutex_unlock(&philo->eat_lock);
-
-    pthread_mutex_unlock(philo->left_fork);
-    pthread_mutex_unlock(philo->right_fork);
-    
     pthread_mutex_lock(&philo->eat_count_lock);
     philo->eat_count++;
     pthread_mutex_unlock(&philo->eat_count_lock);
 }
+
+
+
 
 void    print_log(t_philo *philo, char *msg)
 {
