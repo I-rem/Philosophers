@@ -2,28 +2,26 @@ NAME        := philo
 CC        := gcc
 FLAGS    := -Wall -Wextra -Werror 
 
-SRCS        :=      philo.c
+SRCS        :=	philo.c
 
 OBJS        := $(SRCS:.c=.o)
 
-.c.o:
+.c.o:	
 	${CC} ${FLAGS} -c $< -o ${<:.c=.o}
 
-RM		    := rm -f
+RM	:= rm -f
 
 ${NAME}:	${OBJS}
-			${CC} ${FLAGS} -o ${NAME} ${OBJS}
+	${CC} -pthread ${FLAGS} -o ${NAME} ${OBJS}
 
-all:		${NAME}
-
-bonus:		all
+all:	${NAME}
 
 clean:
-			@ ${RM} ${OBJS}
+	@ ${RM} ${OBJS}
 
-fclean:		clean
-			@ ${RM} ${NAME}
+fclean:	clean
+	@ ${RM} ${NAME}
 
-re:			fclean all
+re:	fclean all
 
-.PHONY:		all clean fclean re
+.PHONY:	all clean fclean re
