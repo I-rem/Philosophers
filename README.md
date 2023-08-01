@@ -90,4 +90,15 @@ side. If there is only one philosopher, there should be only one fork on the tab
 with a mutex for each of them.
 
 # Evaluation
-
+## Mandatory Part
+### Error Handling
+Follow the norm, make sure there are no memory leaks.
+### Global Variables
+Check if there is any global variable which is used to manage the shared resources among the philosophers
+### philo code
+Ensure the code of philo compiles with the following requierements and ask for explanations
+- Check there is one thread per philosopher
+- Check there is only one fork per philosopher
+- Check if there is a mutex per fork and that it is used to check the for value and/or change it
+- Check the outputs are never mixed up
+- Check how the death of a philosopher is verified and if there is a mutex to prevent a philosopher from dying and starting eating at the same time
