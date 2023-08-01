@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philo.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ikayacio <ikayacio@student.42istanbul.com  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/23 11:15:18 by ikayacio          #+#    #+#             */
-/*   Updated: 2023/06/23 11:16:34 by ikayacio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef PHILO_H
 # define PHILO_H
 # include <string.h>
@@ -22,20 +10,22 @@
 typedef struct s_philo	t_philo;
 typedef struct s_table	t_table;
 
-typedef struct s_philo
+typedef struct    s_philo
 {
-	int				id;
-	long			die_time;
-	long			eat_time;
-	long			sleep_time;
-	long			last_eat_time;
-	int				eat_count;
-	int				is_alive;
-	pthread_mutex_t	*right_fork;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	eat_count_lock;
-	t_table			*table;
-}	t_philo;
+    int            id;
+    long            last_eat_time;
+    int            eat_count;
+    int            is_alive;
+    int            die_time;
+    int            eat_time;
+    int            sleep_time;
+    t_table        *table;
+    pthread_mutex_t *left_fork;
+    pthread_mutex_t *right_fork;
+    pthread_mutex_t eat_count_lock;
+    pthread_mutex_t eat_lock;
+}                t_philo;
+
 
 typedef struct s_table
 {
