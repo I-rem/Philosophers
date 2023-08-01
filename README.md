@@ -102,3 +102,13 @@ Ensure the code of philo compiles with the following requierements and ask for e
 - Check if there is a mutex per fork and that it is used to check the for value and/or change it
 - Check the outputs are never mixed up
 - Check how the death of a philosopher is verified and if there is a mutex to prevent a philosopher from dying and starting eating at the same time
+### philo testing
+- Do not test with more than 200 philosophers
+- Do not test with time_to_die or time_to_eat or time_to_sleep set to values lower than 60 ms
+- Test 1 800 200 200. The philosopher shouldn't eat and die
+- Test 5 800 200 200. No philosopher should die
+- Test 5 800 200 200 7. No philosopher should die and simlation should stop after every philoopher has eaten at least 7 times
+- Test 4 410 200 200. No philosopher should die
+- Test 4 310 200 100. One pihlosopher should die
+- Test with 2 philosophers and check the different times: a death delayed by more than 10 ms is unacceptable
+- Test with any values of your choice to verify all the requierements. Ensure philosophers die at the rigt time, that they don't steal forks, and so forths.
