@@ -19,8 +19,16 @@ void    *manager(void *v_philo)
             break ;
         }
     }
+
+    // If there's only one philosopher and he is dead, exit the program.
+    if (philo->table->num_philos == 1 && !philo->is_alive) {
+        free_all(philo->table);
+        exit(0); // Exit the entire program
+    }
+    
     return (NULL);
 }
+
 
 
 void    check_starve(t_philo *philo, long time_since_last_eat)
