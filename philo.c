@@ -64,33 +64,17 @@ void    pick_forks(t_philo *philo)
 {
     pthread_mutex_t    *left_fork;
     pthread_mutex_t    *right_fork;
-    int has_two_forks = 1;
 
     left_fork = philo->left_fork;
     right_fork = philo->right_fork;
-    if (philo->id % 2 == 0)
-    {
-        pthread_mutex_lock(right_fork);
-        if (left_fork != right_fork)
-            pthread_mutex_lock(left_fork);
-        else
-            has_two_forks = 0;
-    }
-    else
-    {
-        pthread_mutex_lock(left_fork);
-        if (left_fork != right_fork)
-            pthread_mutex_lock(right_fork);
-        else
-            has_two_forks = 0;
-    }
-    if (!has_two_forks) 
-    {
-        usleep(philo->die_time * 1000);
-        print_death(philo);
-        philo->is_alive = 0;
-    }
+
+    pthread_mutex_lock(left_fork);
+    print_log(philo, "has taken a fork");
+    pthread_mutex_lock(right_fork);
+    print_log(philo, "has taken a fork");
 }
+
+
 
 
 
@@ -106,11 +90,12 @@ void    *start_routine(void *v_philo)
     {
         check_must_eat_num(philo, philo->table->must_eat_num);
         if (philo->table->has_dead || !philo->is_alive)
-            break ;
+            break;
         eat(philo);
         philo_sleep(philo);
+        print_log(philo, "is thinking");
         if (philo->table->has_dead || !philo->is_alive)
-            break ;
+            break;
     }
     return (NULL);
 }
@@ -227,7 +212,7 @@ void    print_death(t_philo *philo)
     pthread_mutex_lock(&philo->table->print_lock);
     if (!philo->table->has_dead)
     {
-        printf("%ld Philosopher %d died\n", get_timestamp(philo), philo->id);
+        printf("%ld %d died\n", get_timestamp(philo), philo->id);
         philo->table->has_dead = 1;
     }
     pthread_mutex_unlock(&philo->table->print_lock);
@@ -250,11 +235,11 @@ long    get_timestamp(t_philo *philo)
 void    eat(t_philo *philo)
 {
     pick_forks(philo);
-    pthread_mutex_unlock(philo->left_fork);
-    pthread_mutex_unlock(philo->right_fork);
     philo->last_eat_time = get_timestamp(philo);
     print_log(philo, "is eating");
     usleep(philo->eat_time * 1000);
+    pthread_mutex_unlock(philo->left_fork);
+    pthread_mutex_unlock(philo->right_fork);
     pthread_mutex_lock(&philo->eat_count_lock);
     philo->eat_count++;
     pthread_mutex_unlock(&philo->eat_count_lock);
@@ -263,11 +248,12 @@ void    eat(t_philo *philo)
 
 
 
+
 void    print_log(t_philo *philo, char *msg)
 {
     pthread_mutex_lock(&philo->table->print_lock);
     if (!philo->table->has_dead)
-        printf("%ld Philosopher %d %s\n", get_timestamp(philo), philo->id, msg);
+        printf("%ld %d %s\n", get_timestamp(philo), philo->id, msg);
     pthread_mutex_unlock(&philo->table->print_lock);
 }
 
