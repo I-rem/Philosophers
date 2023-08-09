@@ -1,27 +1,21 @@
-NAME        := philo
-CC        := gcc
-FLAGS    := -Wall -Wextra -Werror 
+NAME = philo
+CC = gcc -g
+CFLAGS = -Wall -Wextra -Werror -pthread
+RM = rm -rf
+SRC      :=	philo.c
 
-SRCS        :=	philo.c
+OBJ = $(SRC:.c=.o)
 
-OBJS        := $(SRCS:.c=.o)
+all: $(NAME) philo.h
+$(NAME): $(OBJ)
+		$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-.c.o:	
-	${CC} ${FLAGS} -c $< -o ${<:.c=.o}
-
-RM	:= rm -f
-
-${NAME}:	${OBJS}
-	${CC} -pthread ${FLAGS} -o ${NAME} ${OBJS}
-
-all:	${NAME}
-
-clean:
-	@ ${RM} ${OBJS}
+clean:	
+		$(RM) $(OBJ)
 
 fclean:	clean
-	@ ${RM} ${NAME}
+		$(RM) $(NAME)
 
 re:	fclean all
 
-.PHONY:	all clean fclean re
+.PHONY: all clean fclean re
