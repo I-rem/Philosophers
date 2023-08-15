@@ -8,7 +8,7 @@ void    *manager(void *v_philo)
     long    time_since_last_eat;
 
     die_time = philo->die_time;
-    while (philo->is_alive) 
+    while (philo->is_alive)
     {
         current_time = get_timestamp(philo);
         time_since_last_eat = current_time - philo->last_eat_time;
@@ -25,7 +25,7 @@ void    *manager(void *v_philo)
         free_all(philo->table);
         exit(0); // Exit the entire program
     }
-    
+
     return (NULL);
 }
 
@@ -44,6 +44,10 @@ void    check_starve(t_philo *philo, long time_since_last_eat)
             print_death(philo);
     }
 }
+
+
+
+
 
 void    free_all(t_table *table)
 {
@@ -68,68 +72,66 @@ void    free_all(t_table *table)
 }
 
 
-void    pick_forks(t_philo *philo)
-{
-    pthread_mutex_t    *left_fork;
-    pthread_mutex_t    *right_fork;
+void pick_forks(t_philo *philo) {
+    pthread_mutex_t *first_fork;
+    pthread_mutex_t *second_fork;
 
-    left_fork = philo->left_fork;
-    right_fork = philo->right_fork;
+    if (philo->id % 2 == 1) {  // If philosopher's id is odd, reverse fork order
+        first_fork = philo->right_fork;
+        second_fork = philo->left_fork;
+    } else {
+        first_fork = philo->left_fork;
+        second_fork = philo->right_fork;
+    }
 
-    pthread_mutex_lock(left_fork);
+    pthread_mutex_lock(first_fork);
     print_log(philo, "has taken a fork");
-    pthread_mutex_lock(right_fork);
+    pthread_mutex_lock(second_fork);
     print_log(philo, "has taken a fork");
 }
 
 
-
-
-
-
-void    *start_routine(void *v_philo)
-{
-    pthread_t    manager_thread;
-    t_philo    *philo = v_philo;
+void *start_routine(void *v_philo) {
+    pthread_t manager_thread;
+    t_philo *philo = v_philo;
 
     pthread_create(&manager_thread, NULL, manager, v_philo);
     pthread_detach(manager_thread);
-    while (philo->is_alive)
-    {
-        check_must_eat_num(philo, philo->table->must_eat_num);
-        if (philo->table->has_dead || !philo->is_alive)
-            break;
+
+    while (philo->is_alive) {
         eat(philo);
         philo_sleep(philo);
         print_log(philo, "is thinking");
-        if (philo->table->has_dead || !philo->is_alive)
-            break;
     }
-    return (NULL);
+
+    return NULL;
 }
 
 
 
 
-void    check_must_eat_num(t_philo *philo, int must_eat_num)
-{
-    int    done_eating;
+void check_must_eat_num(t_philo *philo, int must_eat_num) {
+    int done_eating;
 
-    done_eating = 0;
-    if (must_eat_num != -1 && philo->eat_count == must_eat_num)
-    {
+    if (must_eat_num != -1 && philo->eat_count == must_eat_num) {
         pthread_mutex_lock(&philo->table->finish_lock);
         done_eating = ++philo->table->done_eating;
         pthread_mutex_unlock(&philo->table->finish_lock);
-    }
-    if (done_eating == philo->table->num_philos)
-    {
-        pthread_mutex_lock(&philo->table->print_lock);
-        if (!philo->table->has_dead)
-            philo->table->has_dead = 1;
-        pthread_mutex_unlock(&philo->table->print_lock);
+        if (done_eating == philo->table->num_philos) {
+            pthread_mutex_lock(&philo->table->print_lock);
+            if (!philo->table->has_dead) {
+                philo->table->has_dead = 1; // Ensure no further printing.
+
+            }
+            pthread_mutex_unlock(&philo->table->print_lock);
+            // Terminate all philosophers
+            for (int i = 0; i < philo->table->num_philos; i++) {
+                philo->table->philos[i].is_alive = 0;
+            }
+        }
     }
 }
+
 
 int    main(int argc, char **argv)
 {
@@ -140,7 +142,7 @@ int    main(int argc, char **argv)
     must_eat_num = -1;
     if (!arg_check(argv, argc)    || ft_atoi(argv[1]) == -1 ||
         ft_atoi(argv[2]) == -1 || ft_atoi(argv[3]) == -1
-        || ft_atoi(argv[4]) == -1 || (argc == 6 && ft_atoi(argv[5]) == -1)) 
+        || ft_atoi(argv[4]) == -1 || (argc == 6 && ft_atoi(argv[5]) == -1))
     {
         write(2, "Enter valid arguments!\n", 23);
         return (1);
@@ -194,7 +196,7 @@ void    init_philos(t_table *table, int die_time, int eat_time, int sleep_time)
         table->philos[i].sleep_time = sleep_time;
         table->philos[i].eat_count = 0;
         table->philos[i].is_alive = 1;
-	pthread_mutex_init(&table->philos[i].eat_lock, NULL);
+
         table->philos[i].table = table;
         table->philos[i].left_fork = &table->forks[i];
         table->philos[i].right_fork = &table->forks[(i + 1)
@@ -240,19 +242,24 @@ long    get_timestamp(t_philo *philo)
     return (current_timestamp - start_time);
 }
 
-void    eat(t_philo *philo)
-{
+void eat(t_philo *philo) {
     pick_forks(philo);
+
     philo->last_eat_time = get_timestamp(philo);
     print_log(philo, "is eating");
     usleep(philo->eat_time * 1000);
-    pthread_mutex_unlock(philo->left_fork);
+
     pthread_mutex_unlock(philo->right_fork);
-    pthread_mutex_lock(&philo->eat_count_lock);
-    philo->eat_count++;
+    pthread_mutex_unlock(philo->left_fork);
+
+    // Increase the eat count if eating was successful and philosopher is alive
+     pthread_mutex_lock(&philo->eat_count_lock);
+    if(philo->is_alive) {
+        philo->eat_count++;
+        check_must_eat_num(philo, philo->table->must_eat_num);
+    }
     pthread_mutex_unlock(&philo->eat_count_lock);
 }
-
 
 
 
