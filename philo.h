@@ -56,4 +56,5 @@ void	eat(t_philo *philo);
 void	*start_routine(void *philo);
 int		ft_atoi(const char *str);
 int		arg_check(char **argv, int argc);
+void	pick_forks(t_philo *philo);
 #endif
