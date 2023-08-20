@@ -1,50 +1,25 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   print_utils.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ikayacio <ikayacio@student.42istanbul.com  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/19 16:19:11 by ikayacio          #+#    #+#             */
-/*   Updated: 2023/07/19 16:19:13 by ikayacio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philo.h"
 
-long	get_timestamp(t_philo *philo)
+long    get_timestamp(t_philo *philo)
 {
-	struct timeval	current_time;
-	long			timestamp;
+    struct timeval    current_time;
+    long              start_time;
+    long              current_timestamp;
 
-	gettimeofday(&current_time, NULL);
-	timestamp = (current_time.tv_sec - philo->table->start_time.tv_sec) * 1000
-		+ (current_time.tv_usec - philo->table->start_time.tv_usec) / 1000;
-	return (timestamp);
+    gettimeofday(&current_time, NULL);
+    start_time = philo->table->start_time.tv_sec * 1000 +
+        philo->table->start_time.tv_usec / 1000;
+    current_timestamp = current_time.tv_sec * 1000 +
+        current_time.tv_usec / 1000;
+    return (current_timestamp - start_time);
 }
 
-void	print_log(t_philo *philo, char *message)
+void    print_log(t_philo *philo, char *msg)
 {
-	pthread_mutex_lock(&philo->table->print_lock);
-	if (!philo->table->has_dead)
-	{
-		printf("%ld %d %s\n", get_timestamp(philo), philo->id, message);
-		if (message[0] == 'd') // !
-		philo->table->has_dead=1; // !
-	}
-	pthread_mutex_unlock(&philo->table->print_lock);
-}
-
-void	print_death(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->table->print_lock);
-	if (!philo->table->has_dead)
-	{
-		printf("%ld %d died\n", get_timestamp(philo), philo->id);
-		philo->is_alive = 0;
-		philo->table->has_dead = 1;
-	}
-	pthread_mutex_unlock(&philo->table->print_lock);
+    pthread_mutex_lock(&philo->table->print_lock);
+    if (!philo->table->has_dead)
+        printf("%ld %d %s\n", get_timestamp(philo), philo->id, msg);
+    pthread_mutex_unlock(&philo->table->print_lock);
 }
 
 int	ft_atoi(const char *str)
@@ -74,4 +49,25 @@ int	arg_check(char **argv, int argc)
 	if (argc != 5 && argc != 6)
 		return (0);
 	return (1);
+}
+
+void	free_all(t_table *table)
+{
+	int	i;
+
+	i = -1;
+	while (++i < table->num_philos)
+	{
+		pthread_mutex_destroy(&table->forks[i]);
+		pthread_mutex_destroy(&table->philos[i].eat_count_lock);
+		pthread_mutex_destroy(&table->philos[i].eat_lock);
+	}
+	pthread_mutex_destroy(&table->print_lock);
+	pthread_mutex_destroy(&table->finish_lock);
+	if (table->philos != NULL)
+		free(table->philos);
+	if (table->forks != NULL)
+		free(table->forks);
+	if (table->threads != NULL)
+		free(table->threads);
 }
