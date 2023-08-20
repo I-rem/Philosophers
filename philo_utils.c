@@ -1,24 +1,22 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philo_utils.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ikayacio <ikayacio@student.42istanbul.com  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/19 16:19:02 by ikayacio          #+#    #+#             */
-/*   Updated: 2023/07/19 16:19:04 by ikayacio         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philo.h"
 
-void	philo_sleep(t_philo *philo)
+void	check_starve(t_philo *philo, long time_since_last_eat)
 {
-	print_log(philo, "is sleeping");
-	usleep(philo->sleep_time * 1000);
-	pthread_mutex_lock(&philo->eat_count_lock);
-	philo->eat_count++; // !
-	pthread_mutex_unlock(&philo->eat_count_lock);
+	int	done_eating;
+
+	if (philo->is_alive && time_since_last_eat > philo->die_time)
+	{
+		pthread_mutex_lock(&philo->table->finish_lock);
+		done_eating = philo->table->done_eating;
+		pthread_mutex_unlock(&philo->table->finish_lock);
+		if (done_eating < philo->table->num_philos - 1)
+		if (!philo->table->has_dead)
+    {
+		print_log(philo, "died");
+        //printf("%ld %d died\n", get_timestamp(philo), philo->id);
+        philo->table->has_dead = 1;
+    }
+	}
 }
 
 void	init_table(t_table *table, int philo_num, int must_eat_num)
@@ -49,13 +47,14 @@ void	init_philos(t_table *table, int die_time, int eat_time, int sleep_time)
 		table->philos[i].sleep_time = sleep_time;
 		table->philos[i].eat_count = 0;
 		table->philos[i].is_alive = 1;
-		table->philos[i].table = table;
+        table->philos[i].table = table;
 		table->philos[i].left_fork = &table->forks[i];
 		table->philos[i].right_fork = &table->forks[(i + 1)
 			% table->num_philos];
 		pthread_mutex_init(&table->philos[i].eat_count_lock, NULL);
-		i++;
-	}
+        pthread_mutex_init(&table->philos[i].eat_lock, NULL);
+        i++;
+    }
 }
 
 void	init_forks(t_table *table)
@@ -67,18 +66,21 @@ void	init_forks(t_table *table)
 		pthread_mutex_init(&table->forks[i], NULL);
 }
 
-
 void	eat(t_philo *philo)
 {
-	pick_forks(philo);
-	if (!philo->table->has_dead)
-	{
-		print_log(philo, "is eating");
-		philo->eat_count += 1;
-		philo->last_eat_time = get_timestamp(philo);
-		usleep(philo->eat_time * 1000);
+    pick_forks(philo);
 
-	}
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	philo->last_eat_time = get_timestamp(philo);
+	print_log(philo, "is eating");
+	usleep(philo->eat_time * 1000);
+    pthread_mutex_unlock(philo->right_fork);
+    pthread_mutex_unlock(philo->left_fork);
+    // Increase the eat count if eating was successful and philosopher is alive
+     pthread_mutex_lock(&philo->eat_count_lock);
+    if(philo->is_alive)
+	{
+        philo->eat_count++;
+        check_must_eat_num(philo, philo->table->must_eat_num);
+    }
+    pthread_mutex_unlock(&philo->eat_count_lock);
 }
