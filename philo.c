@@ -1,5 +1,5 @@
 #include "philo.h"
-
+/*
 void	*manager(void *v_philo)
 {
 	t_philo	*philo = v_philo;
@@ -28,7 +28,7 @@ void	*manager(void *v_philo)
 		free_all(philo->table);
 	return (NULL);
 }
-
+*/
 void	pick_forks(t_philo *philo)
 {
 	pthread_mutex_t	*first_fork;
