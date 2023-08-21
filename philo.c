@@ -124,7 +124,7 @@ int    main(int argc, char **argv)
 	init_forks(&table);
 	init_philos(&table, ft_atoi(argv[2]), ft_atoi(argv[3]), ft_atoi(argv[4]));
 	i = -1;
-	while (++i < table.num_philos)
+   	 while (++i < table.num_philos)
         pthread_create(&table.threads[i], NULL, start_routine, &table.philos[i]);
 	i = -1;
 	while (++i < table.num_philos)
