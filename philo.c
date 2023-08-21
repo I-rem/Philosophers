@@ -52,19 +52,33 @@ void	pick_forks(t_philo *philo)
 
 void	*start_routine(void *v_philo)
 {
-    pthread_t	manager_thread;
-    t_philo	*philo = v_philo;
+    t_philo *philo = v_philo;
+    long    die_time;
+    long    current_time;
+    long    time_since_last_eat;
 
-    pthread_create(&manager_thread, NULL, manager, v_philo);
-    pthread_detach(manager_thread);
-	while (philo->is_alive)
-	{
-		eat(philo);
-		print_log(philo, "is sleeping");
-		usleep(philo->sleep_time * 1000);
-		print_log(philo, "is thinking");
+    die_time = philo->die_time;
+    while (philo->is_alive)
+    {
+        current_time = get_timestamp(philo);
+        time_since_last_eat = current_time - philo->last_eat_time;
+        pthread_mutex_lock(&philo->eat_lock);
+        if (time_since_last_eat > die_time)
+            if (philo->is_alive)
+            {
+                print_log(philo, "died");
+                philo->is_alive = 0;
+                pthread_mutex_unlock(&philo->eat_lock);
+                break;
+            }
+        pthread_mutex_unlock(&philo->eat_lock);
+        eat(philo);
+        print_log(philo, "is sleeping");
+        usleep(philo->sleep_time * 1000);
+        print_log(philo, "is thinking");
     }
     return (NULL);
+}
 }
 
 void	check_must_eat_num(t_philo *philo, int must_eat_num)
