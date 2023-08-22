@@ -20,7 +20,8 @@ void init_philos(t_table *table, int die_time, int eat_time, int sleep_time)
   int i;
 
   i = 0;
-  while (i < table->num_philos) {
+  while (i < table->num_philos)
+  {
     table->philos[i].id = i + 1;
     table->philos[i].die_time = die_time;
     table->philos[i].eat_time = eat_time;
@@ -43,4 +44,23 @@ void init_forks(t_table *table) {
   i = -1;
   while (++i < table->num_philos)
     pthread_mutex_init(&table->forks[i], NULL);
+}
+
+void  philo_sleep(int type, t_philo *philo)
+{
+  if (type == 1)
+  {
+    print_log(philo, "is sleeping");
+    if (philo->sleep_time >= philo->die_time)
+      usleep(1000*(philo->die_time));
+    else
+      usleep(philo->sleep_time * 1000);
+  }
+  else
+  {
+    if (philo->eat_time >= philo->die_time)
+      usleep(1000*(philo->die_time));
+    else
+      usleep(philo->eat_time * 1000);
+  }
 }
