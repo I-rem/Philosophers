@@ -8,6 +8,7 @@ void *start_routine(void *v_philo)
   while (!philo->table->has_dead && !is_dead(philo)
   && !((philo->eat_count == philo->table->must_eat_num) && philo->table->must_eat_num != 0))
   {
+    print_log(philo, "is thinking");
     if (philo->id % 2 == 1)
       eat(philo, 1);
     else
@@ -29,7 +30,6 @@ void free_all(t_table *table) {
     pthread_mutex_destroy(&table->philos[i].eat_lock);
   }
   pthread_mutex_destroy(&table->print_lock);
-  pthread_mutex_destroy(&table->finish_lock);
   if (table->philos != NULL)
     free(table->philos);
   if (table->forks != NULL)
