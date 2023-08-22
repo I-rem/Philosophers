@@ -27,7 +27,7 @@ void *start_routine(void *v_philo) {
   while (!philo->table->has_dead && !is_dead(philo)
   && !((philo->eat_count == philo->table->must_eat_num) && philo->table->must_eat_num != 0))
   {
-    print_log(philo, "is thinking");
+
     if (philo->id % 2 == 1)
       eat(philo, 1);
     else
