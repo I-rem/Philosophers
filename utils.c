@@ -43,11 +43,6 @@ void eat_2(t_philo *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_
   if (first_fork != second_fork)
     {
         pthread_mutex_lock(second_fork);
-        if(is_dead(philo))
-        {
-          pthread_mutex_unlock(second_fork);
-          return ;
-        }
         print_log(philo, "has taken a fork");
         print_log(philo, "is eating");
         philo->eat_count++;
