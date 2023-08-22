@@ -2,7 +2,7 @@ NAME = philo
 CC = gcc -g
 CFLAGS = -Wall -Wextra -Werror -pthread
 RM = rm -rf
-SRC      :=	philo.c
+SRC      :=	main.c utils.c init.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -10,7 +10,7 @@ all: $(NAME) philo.h
 $(NAME): $(OBJ)
 		$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-clean:	
+clean:
 		$(RM) $(OBJ)
 
 fclean:	clean
