@@ -1,33 +1,13 @@
 #include "philo.h"
 
-void philo_sleep(int type, t_philo *philo)
+void *start_routine(void *v_philo)
 {
-  if (type == 1)
-  {
-    print_log(philo, "is sleeping");
-     if (philo->sleep_time >= philo->die_time)
-      usleep(1000*(philo->die_time));
-    else
-      usleep(philo->sleep_time * 1000);
-  }
-  else
-  {
-    if (philo->eat_time >= philo->die_time)
-      usleep(1000*(philo->die_time));
-    else
-      usleep(philo->eat_time * 1000);
-  }
-}
-
-void *start_routine(void *v_philo) {
   t_philo *philo;
 
   philo = (t_philo *)v_philo;
-  //print_log(philo, "is thinking");
   while (!philo->table->has_dead && !is_dead(philo)
   && !((philo->eat_count == philo->table->must_eat_num) && philo->table->must_eat_num != 0))
   {
-
     if (philo->id % 2 == 1)
       eat(philo, 1);
     else
