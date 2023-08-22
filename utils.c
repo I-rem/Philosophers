@@ -31,21 +31,8 @@ void print_log(t_philo *philo, char *s) {
   pthread_mutex_unlock(&philo->table->print_lock);
 }
 
-void eat(t_philo *philo, int type)
+void eat_2(t_philo *philo, pthread_mutex_t *first_fork, pthread_mutex_t *second_fork)
 {
-  pthread_mutex_t *first_fork;
-  pthread_mutex_t *second_fork;
-
-  if (type == 1)
-  {
-    first_fork = philo->left_fork;
-    second_fork = philo->right_fork;
-  }
-  else
-  {
-    first_fork = philo->right_fork;
-    second_fork = philo->left_fork;
-  }
   pthread_mutex_lock(first_fork);
   if(is_dead(philo))
   {
@@ -71,4 +58,22 @@ void eat(t_philo *philo, int type)
     else
         usleep(philo->die_time*1000);
     pthread_mutex_unlock(first_fork);
+}
+
+void eat(t_philo *philo, int type)
+{
+  pthread_mutex_t *first_fork;
+  pthread_mutex_t *second_fork;
+
+  if (type == 1)
+  {
+    first_fork = philo->left_fork;
+    second_fork = philo->right_fork;
   }
+  else
+  {
+    first_fork = philo->right_fork;
+    second_fork = philo->left_fork;
+  }
+  eat_2(philo, first_fork, second_fork);
+}
