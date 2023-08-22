@@ -5,13 +5,11 @@ void init_table(t_table *table, int philo_num, int must_eat_num)
   table->num_philos = philo_num;
   table->must_eat_num = must_eat_num;
   table->has_dead = 0;
-  table->done_eating = 0;
   gettimeofday(&table->start_time, NULL);
   table->philos = malloc(philo_num * sizeof(t_philo));
   table->forks = malloc(philo_num * sizeof(pthread_mutex_t));
   table->threads = malloc(philo_num * sizeof(pthread_t));
   pthread_mutex_init(&table->print_lock, NULL);
-  pthread_mutex_init(&table->finish_lock, NULL);
   memset(table->philos, 0, philo_num * sizeof(t_philo));
 }
 
