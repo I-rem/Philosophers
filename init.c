@@ -10,6 +10,7 @@ void init_table(t_table *table, int philo_num, int must_eat_num)
   table->forks = malloc(philo_num * sizeof(pthread_mutex_t));
   table->threads = malloc(philo_num * sizeof(pthread_t));
   pthread_mutex_init(&table->print_lock, NULL);
+  pthread_mutex_init(&table->death_lock, NULL);
   memset(table->philos, 0, philo_num * sizeof(t_philo));
 }
 
