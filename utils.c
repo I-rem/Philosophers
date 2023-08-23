@@ -4,12 +4,15 @@ int is_dead(t_philo *philo) {
   long current_time;
 
   current_time = get_timestamp(philo);
+  pthread_mutex_lock(&philo->table->death_lock);
   if (current_time - philo->last_eat_time >= philo->die_time) {
     print_log(philo, "died");
     philo->table->has_dead = 1;
     philo->is_alive = 0;
+    pthread_mutex_unlock(&philo->table->death_lock);
     return (1);
   }
+  pthread_mutex_unlock(&philo->table->death_lock);
   return (0);
 }
 long get_timestamp(t_philo *philo) {
