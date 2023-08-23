@@ -30,6 +30,7 @@ void free_all(t_table *table) {
     pthread_mutex_destroy(&table->philos[i].eat_lock);
   }
   pthread_mutex_destroy(&table->print_lock);
+  pthread_mutex_destroy(&table->death_lock);
   if (table->philos != NULL)
     free(table->philos);
   if (table->forks != NULL)
