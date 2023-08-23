@@ -24,11 +24,8 @@ void free_all(t_table *table) {
   int i;
 
   i = -1;
-  while (++i < table->num_philos) {
+  while (++i < table->num_philos)
     pthread_mutex_destroy(&table->forks[i]);
-    //pthread_mutex_destroy(&table->philos[i].eat_count_lock);
-    pthread_mutex_destroy(&table->philos[i].eat_lock);
-  }
   pthread_mutex_destroy(&table->print_lock);
   pthread_mutex_destroy(&table->death_lock);
   if (table->philos != NULL)
