@@ -32,6 +32,7 @@ typedef struct s_table {
   int has_dead;
   pthread_mutex_t *forks;
   pthread_mutex_t print_lock;
+  pthread_mutex_t death_lock;
   pthread_t *threads;
   struct timeval start_time;
 } t_table;
